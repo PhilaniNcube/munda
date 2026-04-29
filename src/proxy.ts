@@ -1,17 +1,12 @@
-import { betterFetch } from "@better-fetch/fetch";
 import { NextResponse, type NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 
 export default async function proxy(request: NextRequest) {
-    const { data: session } = await betterFetch(
-        "/api/auth/get-session",
-        {
-            baseURL: request.nextUrl.origin,
-            headers: {
-                //get the cookie from the request
-                cookie: request.headers.get("cookie") || "",
-            },
-        },
-    );
+    // Full session validation using Node.js runtime
+    const session = await auth.api.getSession({ headers: request.headers });
+    
+    console.log("[Proxy Auth Debug] Path:", request.nextUrl.pathname);
+    console.log("[Proxy Auth Debug] Session details:", session ? `User ID: ${session.user?.id}` : "No session found");
 
     if (!session) {
         return NextResponse.redirect(new URL("/sign-in", request.url));
@@ -21,5 +16,6 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*"],
+    runtime: "nodejs",
+    matcher: ["/dashboard", "/dashboard/:path*"],
 };

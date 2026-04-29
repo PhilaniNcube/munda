@@ -1,65 +1,54 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Bell, CalendarDays } from "lucide-react";
+import { Search, Bell, CircleHelp, Settings } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import AuthButtons from "./auth/auth-buttons";
 
-interface HeaderProps {
-  title?: string;
-}
-
-export function Header({ title = "Dashboard" }: HeaderProps) {
-  const [today, setToday] = useState<string>("");
-
-  useEffect(() => {
-    setToday(
-      new Date().toLocaleDateString("en-ZA", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    );
-  }, []);
-
+export function Header() {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-agri-surface-container-low px-4">
-      <SidebarTrigger className="-ml-1 text-agri-on-surface-variant hover:text-agri-on-surface" />
-      <Separator orientation="vertical" className="mr-1 h-5" />
+    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-white px-6">
+      <div className="flex items-center gap-4 flex-1">
+        <SidebarTrigger className="-ml-2 text-gray-500 hover:text-gray-900" />
+        <div className="relative w-full max-w-md hidden md:block">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            type="search"
+            placeholder="Search..."
+            className="w-full pl-9 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3821]"
+          />
+        </div>
+      </div>
 
-      <Breadcrumb className="flex-1">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbPage className="text-body-md font-medium text-agri-on-surface">
-              {title}
-            </BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      <div className="flex items-center gap-2">
-        <span className="hidden md:flex items-center gap-1.5 text-body-md text-agri-on-surface-variant">
-          <CalendarDays className="h-4 w-4" />
-          {today}
-        </span>
-        <Separator orientation="vertical" className="hidden md:block h-5" />
+      <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-agri-on-surface-variant hover:text-agri-on-surface hover:bg-agri-surface-container-high"
+          className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
         >
-          <Bell className="h-4.5 w-4.5" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-agri-error" />
+          <Bell className="h-5 w-5" />
           <span className="sr-only">Notifications</span>
         </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-gray-500 hover:text-gray-900 hover:bg-gray-100 hidden sm:inline-flex"
+        >
+          <CircleHelp className="h-5 w-5" />
+          <span className="sr-only">Help</span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-gray-500 hover:text-gray-900 hover:bg-gray-100 hidden sm:inline-flex"
+        >
+          <Settings className="h-5 w-5" />
+          <span className="sr-only">Settings</span>
+        </Button>
+
+        <AuthButtons />
       </div>
     </header>
   );

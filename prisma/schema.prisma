@@ -25,14 +25,101 @@ model User {
 }
 
 model Farm {
-  id        String   @id @default(cuid())
+  id             String          @id @default(cuid())
+  name           String
+  location       String?
+  size           Float?
+  userId         String          @map("user_id")
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  crops          Crop[]
+  livestock      Livestock[]
+  transactions   Transaction[]
+  inventoryItems InventoryItem[]
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+}
+
+enum CropStatus {
+  PLANNED
+  GROWING
+  HARVESTED
+  FAILED
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum InventoryCategory {
+  EQUIPMENT
+  SEEDS
+  FERTILIZER
+  FEED
+  OTHER
+}
+
+model Crop {
+  id                  String     @id @default(cuid())
+  name                String
+  variety             String?
+  status              CropStatus @default(PLANNED)
+  plantingDate        DateTime?  @map("planting_date")
+  expectedHarvestDate DateTime?  @map("expected_harvest_date")
+  actualHarvestDate   DateTime?  @map("actual_harvest_date")
+  farmId              String     @map("farm_id")
+  farm                Farm       @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  createdAt           DateTime   @default(now()) @map("created_at")
+  updatedAt           DateTime   @updatedAt @map("updated_at")
+}
+
+model Livestock {
+  id           String   @id @default(cuid())
+  type         String
+  breed        String?
+  quantity     Int      @default(0)
+  healthStatus String?  @map("health_status")
+  farmId       String   @map("farm_id")
+  farm         Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  type        TransactionType
+  category    String
+  amount      Float
+  date        DateTime        @default(now())
+  description String?
+  attachments Attachment[]
+  farmId      String          @map("farm_id")
+  farm        Farm            @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+}
+
+model Attachment {
+  id            String       @id @default(cuid())
+  url           String
+  name          String?
+  fileType      String?      @map("file_type")
+  transactionId String?      @map("transaction_id")
+  transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+}
+
+model InventoryItem {
+  id        String            @id @default(cuid())
   name      String
-  location  String?
-  size      Float?
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  category  InventoryCategory @default(OTHER)
+  quantity  Float             @default(0)
+  unit      String            @default("units")
+  farmId    String            @map("farm_id")
+  farm      Farm              @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
 }
 
 model Session {

@@ -2,16 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Leaf, Mail, Lock, LogIn, ShieldCheck, CloudUpload } from "lucide-react";
+import { Leaf, Mail, Lock, LogIn, ShieldCheck, CloudUpload, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useActionState, useEffect, startTransition } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { signInAction } from "@/app/actions/auth";
+import { signIn } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -20,7 +21,7 @@ const signInSchema = z.object({
 
 export default function SignInPage() {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(signInAction, null);
+  const [isPending, setIsPending] = useState(false);
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -30,27 +31,20 @@ export default function SignInPage() {
     },
   });
 
-  useEffect(() => {
-    if (state?.success) {
-      router.push("/dashboard");
-    } else if (state?.errors) {
-      Object.entries(state.errors).forEach(([key, messages]) => {
-        if (key === "root") {
-            form.setError("root", { type: "server", message: (messages as string[])?.[0] });
-        } else {
-            form.setError(key as any, { type: "server", message: (messages as string[])?.[0] });
-        }
-      });
-    }
-  }, [state, form, router]);
-
-  const onSubmit = (values: z.infer<typeof signInSchema>) => {
-    startTransition(() => {
-      const formData = new FormData();
-      formData.append("email", values.email);
-      formData.append("password", values.password);
-      formAction(formData);
+  const onSubmit = async (values: z.infer<typeof signInSchema>) => {
+    setIsPending(true);
+    const { data, error } = await signIn.email({
+      email: values.email,
+      password: values.password,
     });
+    setIsPending(false);
+
+    if (error) {
+      form.setError("root", { type: "server", message: error.message || "Failed to sign in" });
+    } else {
+      toast.success("Welcome back! You have signed in successfully.");
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -87,7 +81,8 @@ export default function SignInPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               {form.formState.errors.root && (
-                <div className="text-sm font-medium text-destructive">
+                <div className="p-3 rounded-md bg-destructive/15 text-destructive text-sm font-medium flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
                   {form.formState.errors.root.message}
                 </div>
               )}
