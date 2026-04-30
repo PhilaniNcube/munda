@@ -37,6 +37,7 @@ model Farm {
   inventoryItems InventoryItem[]
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
+  tasks          Task[]
 }
 
 enum CropStatus {
@@ -71,6 +72,7 @@ model Crop {
   farm                Farm       @relation(fields: [farmId], references: [id], onDelete: Cascade)
   createdAt           DateTime   @default(now()) @map("created_at")
   updatedAt           DateTime   @updatedAt @map("updated_at")
+  tasks               Task[]
 }
 
 model Livestock {
@@ -83,6 +85,7 @@ model Livestock {
   farm         Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+  tasks        Task[]
 }
 
 model Transaction {
@@ -95,6 +98,8 @@ model Transaction {
   attachments Attachment[]
   farmId      String          @map("farm_id")
   farm        Farm            @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  taskId      String?         @map("task_id")
+  task        Task?           @relation(fields: [taskId], references: [id], onDelete: SetNull)
   createdAt   DateTime        @default(now()) @map("created_at")
   updatedAt   DateTime        @updatedAt @map("updated_at")
 }
@@ -118,8 +123,9 @@ model InventoryItem {
   unit      String            @default("units")
   farmId    String            @map("farm_id")
   farm      Farm              @relation(fields: [farmId], references: [id], onDelete: Cascade)
-  createdAt DateTime          @default(now()) @map("created_at")
-  updatedAt DateTime          @updatedAt @map("updated_at")
+  createdAt  DateTime             @default(now()) @map("created_at")
+  updatedAt  DateTime             @updatedAt @map("updated_at")
+  taskUsages TaskInventoryUsage[]
 }
 
 model Session {
@@ -159,3 +165,57 @@ model Verification {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
 }
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?    @map("due_date")
+  completedAt DateTime?    @map("completed_at")
+
+  farmId      String       @map("farm_id")
+  farm        Farm         @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  transactions  Transaction[]
+  inventoryUsed TaskInventoryUsage[]
+
+  cropId      String?      @map("crop_id")
+  crop        Crop?        @relation(fields: [cropId], references: [id], onDelete: SetNull)
+
+  livestockId String?      @map("livestock_id")
+  livestock   Livestock?   @relation(fields: [livestockId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+}
+
+model TaskInventoryUsage {
+  id              String        @id @default(cuid())
+  quantityUsed    Float         @map("quantity_used")
+  
+  taskId          String        @map("task_id")
+  task            Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  inventoryItemId String        @map("inventory_item_id")
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+}
+
