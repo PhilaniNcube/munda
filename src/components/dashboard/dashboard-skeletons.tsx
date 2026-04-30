@@ -27,11 +27,11 @@ export function MetricCardSkeleton() {
         </div>
 
         <div className="h-24 flex items-end justify-between gap-2 mt-auto">
-          {[...Array(6)].map((_, i) => (
+          {["40%", "70%", "55%", "85%", "45%", "60%"].map((height, i) => (
             <Skeleton 
               key={i} 
               className="w-full rounded-sm" 
-              style={{ height: `${Math.floor(Math.random() * 60) + 20}%` }} 
+              style={{ height }} 
             />
           ))}
         </div>
