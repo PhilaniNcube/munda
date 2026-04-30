@@ -2,21 +2,26 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { TransactionActions } from "./transaction-actions";
 
 interface LedgerRowProps {
+  id: string;
   date: Date;
   description: string;
   category: string;
   type: "INCOME" | "EXPENSE";
   amount: number;
+  attachmentId?: string;
 }
 
-export function LedgerRow({ date, description, category, type, amount }: LedgerRowProps) {
+export function LedgerRow({ id, date, description, category, type, amount, attachmentId }: LedgerRowProps) {
+
+
   const isIncome = type === "INCOME";
 
   return (
     <tr className="border-b border-agri-outline-variant hover:bg-agri-surface-container-high transition-colors">
-      <td className="py-4 px-4 text-data-table text-agri-on-surface">
+      <td className="py-4 px-4 text-data-table text-agri-on-surface whitespace-nowrap">
         {format(date, "MMM dd, yyyy")}
       </td>
       <td className="py-4 px-4 text-data-table text-agri-on-surface">
@@ -45,6 +50,14 @@ export function LedgerRow({ date, description, category, type, amount }: LedgerR
       )}>
         {isIncome ? "" : "-"}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </td>
+      <td className="py-4 px-4">
+        <TransactionActions 
+          transactionId={id} 
+          description={description} 
+          attachmentId={attachmentId}
+        />
+      </td>
     </tr>
   );
 }
+

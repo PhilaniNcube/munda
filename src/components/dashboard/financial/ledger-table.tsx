@@ -21,20 +21,26 @@ export function LedgerTable({ transactionsPromise }: LedgerTableProps) {
               <th className="py-3 px-4 text-label-caps text-agri-on-surface-variant">Category</th>
               <th className="py-3 px-4 text-label-caps text-agri-on-surface-variant">Type</th>
               <th className="py-3 px-4 text-label-caps text-agri-on-surface-variant text-right">Amount</th>
+              <th className="py-3 px-4 text-label-caps text-agri-on-surface-variant text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="table-zebra">
             {transactions.map((t) => (
               <LedgerRow 
                 key={t.id}
+                id={t.id}
                 date={t.date}
                 description={t.description || "No description"}
                 category={t.category}
                 type={t.type}
                 amount={t.amount}
+                attachmentId={t.attachments?.[0]?.id}
               />
             ))}
+
+
           </tbody>
+
         </table>
       </div>
       

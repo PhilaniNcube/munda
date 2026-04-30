@@ -1,21 +1,40 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { revalidateTag } from "next/cache";
 
 export async function createInventoryItem(data: Prisma.InventoryItemCreateInput) {
-  return await prisma.inventoryItem.create({
+  const item = await prisma.inventoryItem.create({
     data,
   });
+
+  if (item.farmId) {
+    revalidateTag(`inventory-${item.farmId}`);
+  }
+
+  return item;
 }
 
 export async function updateInventoryItem(id: string, data: Prisma.InventoryItemUpdateInput) {
-  return await prisma.inventoryItem.update({
+  const item = await prisma.inventoryItem.update({
     where: { id },
     data,
   });
+
+  if (item.farmId) {
+    revalidateTag(`inventory-${item.farmId}`);
+  }
+
+  return item;
 }
 
 export async function deleteInventoryItem(id: string) {
-  return await prisma.inventoryItem.delete({
+  const item = await prisma.inventoryItem.delete({
     where: { id },
   });
+
+  if (item.farmId) {
+    revalidateTag(`inventory-${item.farmId}`);
+  }
+
+  return item;
 }

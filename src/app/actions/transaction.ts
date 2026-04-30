@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { revalidateTag } from "next/cache";
-import { createTransaction } from "@/data/transaction/mutations";
+import { createTransaction, deleteTransaction } from "@/data/transaction/mutations";
 
 const transactionSchema = z.object({
   description: z.string().min(1, "Description is required"),
@@ -67,3 +67,36 @@ export async function addTransactionAction(prevState: any, formData: FormData) {
     };
   }
 }
+
+export async function deleteTransactionAction(id: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    // Verify ownership (or farm membership)
+    const transaction = await prisma.transaction.findUnique({
+      where: { id },
+      include: { farm: true },
+    });
+
+    if (!transaction) {
+      return { success: false, message: "Transaction not found" };
+    }
+
+    if (transaction.farm.userId !== session.user.id) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    await deleteTransaction(id);
+
+    return { success: true, message: "Transaction deleted successfully" };
+  } catch (error: any) {
+    return { success: false, message: error?.message || "Failed to delete transaction" };
+  }
+}
+
