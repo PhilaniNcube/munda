@@ -81,7 +81,7 @@ export async function saveAttachmentAction(data: {
     });
 
     if (transaction?.farmId) {
-      revalidateTag(`transactions-${transaction.farmId}`);
+      revalidateTag(`transactions-${transaction.farmId}`, "max");
     }
 
     return { success: true, message: "Attachment saved successfully" };

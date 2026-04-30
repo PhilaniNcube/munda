@@ -8,7 +8,7 @@ export async function createInventoryItem(data: Prisma.InventoryItemCreateInput)
   });
 
   if (item.farmId) {
-    revalidateTag(`inventory-${item.farmId}`);
+    revalidateTag(`inventory-${item.farmId}`, "max");
   }
 
   return item;
@@ -21,7 +21,7 @@ export async function updateInventoryItem(id: string, data: Prisma.InventoryItem
   });
 
   if (item.farmId) {
-    revalidateTag(`inventory-${item.farmId}`);
+    revalidateTag(`inventory-${item.farmId}`, "max");
   }
 
   return item;
@@ -33,7 +33,7 @@ export async function deleteInventoryItem(id: string) {
   });
 
   if (item.farmId) {
-    revalidateTag(`inventory-${item.farmId}`);
+    revalidateTag(`inventory-${item.farmId}`, "max");
   }
 
   return item;

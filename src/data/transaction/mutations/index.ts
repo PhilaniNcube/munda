@@ -8,8 +8,8 @@ export async function createTransaction(data: Prisma.TransactionCreateInput) {
   });
   
   if (transaction.farmId) {
-    revalidateTag(`transactions-${transaction.farmId}`);
-    revalidateTag(`financial-summary-${transaction.farmId}`);
+    revalidateTag(`transactions-${transaction.farmId}`, "max");
+    revalidateTag(`financial-summary-${transaction.farmId}`, "max");
   }
   
   return transaction;
@@ -22,8 +22,8 @@ export async function updateTransaction(id: string, data: Prisma.TransactionUpda
   });
 
   if (transaction.farmId) {
-    revalidateTag(`transactions-${transaction.farmId}`);
-    revalidateTag(`financial-summary-${transaction.farmId}`);
+    revalidateTag(`transactions-${transaction.farmId}`, "max");
+    revalidateTag(`financial-summary-${transaction.farmId}`, "max");
   }
 
   return transaction;
@@ -35,8 +35,8 @@ export async function deleteTransaction(id: string) {
   });
 
   if (transaction.farmId) {
-    revalidateTag(`transactions-${transaction.farmId}`);
-    revalidateTag(`financial-summary-${transaction.farmId}`);
+    revalidateTag(`transactions-${transaction.farmId}`, "max");
+    revalidateTag(`financial-summary-${transaction.farmId}`, "max");
   }
 
   return transaction;

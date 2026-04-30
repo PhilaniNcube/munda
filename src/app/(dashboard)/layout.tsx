@@ -11,7 +11,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <SidebarNav />
       <SidebarInset>
-        <Header title="Farm Overview" />
+        <Header />
         <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-agri-surface">
           <div className="mx-auto max-w-[1440px]">{children}</div>
         </main>
