@@ -1,4 +1,4 @@
-import { Wheat, PawPrint, Sprout } from "lucide-react";
+import { Wheat, PawPrint, Sprout, Hammer, Activity } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -13,6 +13,7 @@ import { headers } from "next/headers";
 import { getFarmsByUserId } from "@/data/farm/queries";
 import { getActiveCropsByFarmId } from "@/data/crop/queries";
 import { getLivestockByFarmId } from "@/data/livestock/queries";
+import { getActiveOperationsByFarmId } from "@/data/task/queries";
 
 const formatRelativeTime = (date: Date) => {
   const now = new Date();
@@ -35,12 +36,30 @@ export async function CurrentOperationsTable() {
   const farm = farms[0];
   if (!farm) return null;
 
-  const [activeCrops, livestock] = await Promise.all([
+  const [activeCrops, livestock, activeTasks] = await Promise.all([
     getActiveCropsByFarmId(farm.id),
     getLivestockByFarmId(farm.id),
+    getActiveOperationsByFarmId(farm.id),
   ]);
 
   const operations: any[] = [];
+
+  // Map tasks to operations (Highest priority)
+  activeTasks.forEach((task) => {
+    operations.push({
+      id: `task-${task.id}`,
+      resource: task.title,
+      location: task.crop ? task.crop.name : (task.livestock ? task.livestock.type : "General"),
+      status: "In Progress",
+      lastUpdate: formatRelativeTime(task.updatedAt),
+      icon: Hammer,
+      iconBg: "bg-agri-secondary-container",
+      iconColor: "text-agri-on-secondary-container",
+      badgeBg: "bg-agri-secondary-container",
+      badgeText: "text-agri-on-secondary-container",
+      priority: 3,
+    });
+  });
 
   // Map crops to operations
   activeCrops.forEach((crop) => {
@@ -55,6 +74,7 @@ export async function CurrentOperationsTable() {
       iconColor: "text-agri-on-primary-container",
       badgeBg: crop.status === "GROWING" ? "bg-agri-tertiary-container" : "bg-agri-primary-container",
       badgeText: crop.status === "GROWING" ? "text-agri-on-tertiary-container" : "text-agri-on-primary-container",
+      priority: crop.status === "GROWING" ? 2 : 1,
     });
   });
 
@@ -67,15 +87,19 @@ export async function CurrentOperationsTable() {
       status: animal.healthStatus || "Healthy",
       lastUpdate: formatRelativeTime(animal.updatedAt),
       icon: PawPrint,
-      iconBg: "bg-agri-secondary-container",
-      iconColor: "text-agri-on-secondary-container",
-      badgeBg: "bg-agri-secondary-container",
-      badgeText: "text-agri-on-secondary-container",
+      iconBg: "bg-agri-surface-container-highest",
+      iconColor: "text-agri-on-surface",
+      badgeBg: "bg-agri-surface-container-highest",
+      badgeText: "text-agri-on-surface",
+      priority: 1,
     });
   });
 
+  // Sort by priority and then by update time
+  const sortedOps = operations.sort((a, b) => b.priority - a.priority);
+
   // Limit to 5 operations
-  const displayOps = operations.slice(0, 5);
+  const displayOps = sortedOps.slice(0, 5);
 
   if (displayOps.length === 0) {
     return (
@@ -99,7 +123,7 @@ export async function CurrentOperationsTable() {
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent border-b-agri-outline-variant">
-              <TableHead className="text-xs font-semibold text-agri-on-surface-variant uppercase px-6 py-4">Resource</TableHead>
+              <TableHead className="text-xs font-semibold text-agri-on-surface-variant uppercase px-6 py-4">Resource/Operation</TableHead>
               <TableHead className="text-xs font-semibold text-agri-on-surface-variant uppercase px-6 py-4">Location/Group</TableHead>
               <TableHead className="text-xs font-semibold text-agri-on-surface-variant uppercase px-6 py-4">Status</TableHead>
               <TableHead className="text-xs font-semibold text-agri-on-surface-variant uppercase px-6 py-4">Last Update</TableHead>
@@ -131,4 +155,5 @@ export async function CurrentOperationsTable() {
     </Card>
   );
 }
+
 
