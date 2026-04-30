@@ -26,44 +26,40 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { addCropAction } from "@/app/actions/crop";
+import { addLivestockAction } from "@/app/actions/livestock";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Crop name is required"),
-  variety: z.string().optional(),
-  plantingDate: z.string().optional(),
-  expectedHarvestDate: z.string().optional(),
-  status: z.enum(["PLANNED", "GROWING", "HARVESTED", "FAILED"]),
+  type: z.string().min(1, "Livestock type is required"),
+  breed: z.string().optional(),
+  quantity: z.number().min(0, "Quantity must be at least 0"),
+  healthStatus: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function AddCropDialog() {
+export function AddLivestockDialog() {
   const [open, setOpen] = useState(false);
-  const [state, formAction, isPending] = useActionState(addCropAction, null);
+  const [state, formAction, isPending] = useActionState(addLivestockAction, null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      variety: "",
-      plantingDate: "",
-      expectedHarvestDate: "",
-      status: "PLANNED",
+      type: "",
+      breed: "",
+      quantity: 0,
+      healthStatus: "Healthy",
     },
   });
 
   useEffect(() => {
     if (state?.success) {
-      toast.success(state.message || "Crop added successfully");
+      toast.success(state.message || "Livestock added successfully");
       setOpen(false);
       form.reset();
     } else if (state?.errors) {
       if ("root" in state.errors && state.errors.root) {
         toast.error((state.errors.root as string[])[0]);
       }
-      // Optional: map other field errors back to the form if needed
     } else if (state?.message && !state?.success) {
       toast.error(state.message);
     }
@@ -74,7 +70,7 @@ export function AddCropDialog() {
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== "") {
-          formData.append(key, value as string);
+          formData.append(key, value.toString());
         }
       });
       formAction(formData);
@@ -83,27 +79,27 @@ export function AddCropDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button className="bg-agri-primary text-white hover:bg-agri-primary/90" />}>
+      <DialogTrigger render={<Button variant="outline" className="border-agri-primary text-agri-primary hover:bg-agri-primary hover:text-white" />}>
         <Plus className="mr-2 size-4" />
-        Add New Crop
+        Add New Livestock
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Crop</DialogTitle>
+          <DialogTitle>Add New Livestock</DialogTitle>
           <DialogDescription>
-            Enter the details for the new crop. Click save when you're done.
+            Enter the details for the new livestock record. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Crop Name</FormLabel>
+                  <FormLabel>Livestock Type</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Winter Wheat" {...field} />
+                    <Input placeholder="e.g. Cattle, Poultry, Pigs" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,12 +107,12 @@ export function AddCropDialog() {
             />
             <FormField
               control={form.control}
-              name="variety"
+              name="breed"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Variety (Optional)</FormLabel>
+                  <FormLabel>Breed (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Hard Red" {...field} />
+                    <Input placeholder="e.g. Holstein, Rhode Island Red" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,12 +121,16 @@ export function AddCropDialog() {
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="plantingDate"
+                name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Planting Date</FormLabel>
+                    <FormLabel>Quantity</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input 
+                        type="number" 
+                        {...field} 
+                        onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -138,41 +138,18 @@ export function AddCropDialog() {
               />
               <FormField
                 control={form.control}
-                name="expectedHarvestDate"
+                name="healthStatus"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Est. Harvest</FormLabel>
+                    <FormLabel>Health Status</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input placeholder="e.g. Healthy, Under Treatment" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="PLANNED">Planned</SelectItem>
-                      <SelectItem value="GROWING">Growing</SelectItem>
-                      <SelectItem value="HARVESTED">Harvested</SelectItem>
-                      <SelectItem value="FAILED">Failed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <DialogFooter className="pt-4">
               <Button
                 type="button"
@@ -183,7 +160,7 @@ export function AddCropDialog() {
                 Cancel
               </Button>
               <Button type="submit" disabled={isPending} className="bg-agri-primary text-white hover:bg-agri-primary/90">
-                {isPending ? "Saving..." : "Save Crop"}
+                {isPending ? "Saving..." : "Save Livestock"}
               </Button>
             </DialogFooter>
           </form>

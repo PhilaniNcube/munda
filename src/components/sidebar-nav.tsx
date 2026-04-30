@@ -80,7 +80,6 @@ export function SidebarNav() {
                           ? "bg-[#eaf5ed] text-[#154212] font-semibold hover:bg-[#eaf5ed] hover:text-[#154212]"
                           : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                       }
-                      asChild
                     >
                       <Link href={item.href} className="flex items-center gap-3 px-3 py-2">
                         <item.icon className="h-5 w-5" />
@@ -109,7 +108,7 @@ export function SidebarNav() {
                       ? "bg-[#eaf5ed] text-[#154212] font-semibold hover:bg-[#eaf5ed] hover:text-[#154212]"
                       : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                   }
-                  asChild
+
                 >
                   <Link href={item.href} className="flex items-center gap-3 px-3 py-2">
                     <item.icon className="h-5 w-5" />

@@ -2,6 +2,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "./components/page-header";
 import { ActiveCropsTable } from "./components/active-crops-table";
 import { ActiveCropsTableSkeleton } from "./components/active-crops-table-skeleton";
+import { LivestockTable } from "./components/livestock-table";
+import { LivestockTableSkeleton } from "./components/livestock-table-skeleton";
 import { Suspense } from "react";
 
 export default function CropsLivestockPage() {
@@ -28,9 +30,9 @@ export default function CropsLivestockPage() {
                 </TabsContent>
 
                 <TabsContent value="livestock" className="mt-0 outline-none">
-                    <div className="flex items-center justify-center p-12 bg-agri-surface-container-low border border-dashed border-agri-outline-variant rounded-lg">
-                        <p className="text-agri-on-surface-variant">Livestock management features coming soon.</p>
-                    </div>
+                    <Suspense fallback={<LivestockTableSkeleton />}>
+                        <LivestockTable />
+                    </Suspense>
                 </TabsContent>
             </Tabs>
         </div>

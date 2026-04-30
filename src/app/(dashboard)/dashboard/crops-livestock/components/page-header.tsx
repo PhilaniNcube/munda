@@ -1,6 +1,7 @@
 import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AddCropDialog } from "./add-crop-dialog";
+import { AddLivestockDialog } from "./add-livestock-dialog";
 
 export function PageHeader() {
   return (
@@ -17,6 +18,7 @@ export function PageHeader() {
           Export Report
         </Button>
         <AddCropDialog />
+        <AddLivestockDialog />
       </div>
     </div>
   );

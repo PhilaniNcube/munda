@@ -1,21 +1,44 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { revalidateTag } from "next/cache";
 
 export async function createTransaction(data: Prisma.TransactionCreateInput) {
-  return await prisma.transaction.create({
+  const transaction = await prisma.transaction.create({
     data,
   });
+  
+  if (transaction.farmId) {
+    revalidateTag(`transactions-${transaction.farmId}`);
+    revalidateTag(`financial-summary-${transaction.farmId}`);
+  }
+  
+  return transaction;
 }
 
 export async function updateTransaction(id: string, data: Prisma.TransactionUpdateInput) {
-  return await prisma.transaction.update({
+  const transaction = await prisma.transaction.update({
     where: { id },
     data,
   });
+
+  if (transaction.farmId) {
+    revalidateTag(`transactions-${transaction.farmId}`);
+    revalidateTag(`financial-summary-${transaction.farmId}`);
+  }
+
+  return transaction;
 }
 
 export async function deleteTransaction(id: string) {
-  return await prisma.transaction.delete({
+  const transaction = await prisma.transaction.delete({
     where: { id },
   });
+
+  if (transaction.farmId) {
+    revalidateTag(`transactions-${transaction.farmId}`);
+    revalidateTag(`financial-summary-${transaction.farmId}`);
+  }
+
+  return transaction;
 }
+
