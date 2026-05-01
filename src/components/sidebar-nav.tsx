@@ -9,6 +9,7 @@ import {
   CircleHelp,
   Leaf,
   Plus,
+  ClipboardList,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -30,6 +31,7 @@ import { Button } from "@/components/ui/button";
 const topNavItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Crops & Livestock", href: "/dashboard/crops-livestock", icon: Tractor },
+  { title: "Tasks", href: "/dashboard/tasks", icon: ClipboardList },
   { title: "Financial Ledger", href: "/dashboard/financial", icon: Banknote },
   { title: "Inventory", href: "/dashboard/inventory", icon: Archive },
 ];
