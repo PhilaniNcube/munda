@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { getFarmsByUserId } from "@/data/farm/queries";
 import { getUpcomingTasksByFarmId } from "@/data/task/queries";
 import { TaskPriority, TaskStatus } from "@prisma/client";
+import Link from "next/link";
 
 export async function UpcomingTasks() {
   const session = await auth.api.getSession({
@@ -68,7 +69,7 @@ export async function UpcomingTasks() {
           dbTasks.map((task) => {
             const styles = getPriorityStyles(task.priority);
             const Icon = task.status === TaskStatus.IN_PROGRESS ? Clock : styles.icon;
-            
+
             return (
               <div
                 key={task.id}
@@ -99,9 +100,11 @@ export async function UpcomingTasks() {
         )}
       </CardContent>
       <CardFooter className="pt-2 pb-4">
-        <Button variant="outline" className="w-full font-semibold border-agri-outline-variant text-agri-on-surface">
-          View All Tasks
-        </Button>
+        <Link href="/dashboard/tasks">
+          <Button variant="outline" className="w-full font-semibold border-agri-outline-variant text-agri-on-surface">
+            View All Tasks
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

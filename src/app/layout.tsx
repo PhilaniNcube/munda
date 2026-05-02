@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 };
 
 import { Toaster } from "@/components/ui/sonner";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export default function RootLayout({
   children,
@@ -36,7 +37,9 @@ export default function RootLayout({
       className={`${publicSans.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <TooltipProvider>{children}</TooltipProvider>
+        <NuqsAdapter>
+          <TooltipProvider>{children}</TooltipProvider>
+        </NuqsAdapter>
         <Toaster />
       </body>
     </html>

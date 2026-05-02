@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { revalidateTag } from "next/cache";
+import { refresh } from "next/cache";
 import { createTransaction, deleteTransaction } from "@/data/transaction/mutations";
 
 const transactionSchema = z.object({
@@ -57,7 +57,9 @@ export async function addTransactionAction(prevState: any, formData: FormData) {
       },
     });
 
-    // Revalidation is handled inside createTransaction mutation via revalidateTag
+    // Revalidation is handled inside createTransaction mutation via updateTag
+    // refresh() ensures the client-side router is updated
+    refresh();
     return { success: true, message: "Transaction added successfully." };
   } catch (error: any) {
     return { 
@@ -94,6 +96,7 @@ export async function deleteTransactionAction(id: string) {
 
     await deleteTransaction(id);
 
+    refresh();
     return { success: true, message: "Transaction deleted successfully" };
   } catch (error: any) {
     return { success: false, message: error?.message || "Failed to delete transaction" };

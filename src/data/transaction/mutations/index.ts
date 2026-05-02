@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 
 export async function createTransaction(data: Prisma.TransactionCreateInput) {
   const transaction = await prisma.transaction.create({
@@ -8,8 +8,8 @@ export async function createTransaction(data: Prisma.TransactionCreateInput) {
   });
   
   if (transaction.farmId) {
-    revalidateTag(`transactions-${transaction.farmId}`, "max");
-    revalidateTag(`financial-summary-${transaction.farmId}`, "max");
+    updateTag(`transactions-${transaction.farmId}`);
+    updateTag(`financial-summary-${transaction.farmId}`);
   }
   
   return transaction;
@@ -22,8 +22,8 @@ export async function updateTransaction(id: string, data: Prisma.TransactionUpda
   });
 
   if (transaction.farmId) {
-    revalidateTag(`transactions-${transaction.farmId}`, "max");
-    revalidateTag(`financial-summary-${transaction.farmId}`, "max");
+    updateTag(`transactions-${transaction.farmId}`);
+    updateTag(`financial-summary-${transaction.farmId}`);
   }
 
   return transaction;
@@ -35,8 +35,8 @@ export async function deleteTransaction(id: string) {
   });
 
   if (transaction.farmId) {
-    revalidateTag(`transactions-${transaction.farmId}`, "max");
-    revalidateTag(`financial-summary-${transaction.farmId}`, "max");
+    updateTag(`transactions-${transaction.farmId}`);
+    updateTag(`financial-summary-${transaction.farmId}`);
   }
 
   return transaction;
