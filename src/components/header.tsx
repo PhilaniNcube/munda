@@ -4,7 +4,6 @@ import { Search, Bell, CircleHelp, Settings } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AuthButtons from "./auth/auth-buttons";
 
 export function Header() {

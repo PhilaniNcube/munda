@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { InventoryCategory } from "@prisma/client";
-import { cacheLife, cacheTag, revalidateTag } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function getInventoryItemById(id: string) {
   "use cache";

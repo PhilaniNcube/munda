@@ -1,5 +1,3 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { getFarmsByUserId } from "@/data/farm/queries";
 import { 
   getTasksDueTodayCount, 
@@ -9,7 +7,14 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarClock, PlayCircle, AlertCircle } from "lucide-react";
 
-export async function TaskSummaryCards({ sessionPromise }: { sessionPromise: Promise<any> }) {
+interface Session {
+  user: {
+    id: string;
+    [key: string]: unknown;
+  };
+}
+
+export async function TaskSummaryCards({ sessionPromise }: { sessionPromise: Promise<Session | null> }) {
   const session = await sessionPromise;
 
   if (!session?.user?.id) return null;

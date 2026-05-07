@@ -73,8 +73,10 @@ export function NewTaskDialog({ crops, livestock }: NewTaskDialogProps) {
   useEffect(() => {
     if (state?.success) {
       toast.success("Task created successfully");
-      setOpen(false);
-      form.reset();
+      queueMicrotask(() => {
+        setOpen(false);
+        form.reset();
+      });
     } else if (state?.error) {
       toast.error(state.error);
     }

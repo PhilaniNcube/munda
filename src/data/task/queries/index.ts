@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { TaskStatus } from "@prisma/client";
+import { TaskStatus, TaskPriority, Prisma } from "@prisma/client";
 
 export async function getUpcomingTasksByFarmId(farmId: string, limit: number = 5) {
   return await prisma.task.findMany({
@@ -65,9 +65,9 @@ export async function getTasksByFarmId(params: {
   const { farmId, status, priority, category, page = 1, limit = 10 } = params;
   const skip = (page - 1) * limit;
 
-  const where: any = { farmId };
+  const where: Prisma.TaskWhereInput = { farmId };
   if (status) where.status = status;
-  if (priority) where.priority = priority;
+  if (priority) where.priority = priority as TaskPriority;
   
   // Category filtering based on linked crop or livestock
   if (category === "CROPS") {

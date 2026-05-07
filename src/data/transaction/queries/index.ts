@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { cacheTag, cacheLife } from "next/cache";
+import { TransactionType } from "@prisma/client";
 
 export async function getTransactionById(id: string) {
   return await prisma.transaction.findUnique({
@@ -88,7 +89,7 @@ export async function getFilteredTransactions(
         lte: filters.endDate ? new Date(filters.endDate) : undefined,
       },
       category: filters.category && filters.category !== "All Categories" ? filters.category : undefined,
-      type: filters.type && filters.type !== "All Types" ? (filters.type as any) : undefined,
+      type: filters.type && filters.type !== "All Types" ? (filters.type as TransactionType) : undefined,
     },
     orderBy: {
       date: "desc",

@@ -1,5 +1,3 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { getFarmsByUserId } from "@/data/farm/queries";
 import { getTasksByFarmId } from "@/data/task/queries";
 import { TaskStatus, TaskPriority } from "@prisma/client";
@@ -19,13 +17,17 @@ import {
   Layout, 
   ChevronLeft, 
   ChevronRight,
-  Clock,
-  CheckCircle2,
-  XCircle,
   AlertTriangle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+interface Session {
+  user: {
+    id: string;
+    [key: string]: unknown;
+  };
+}
 
 interface TaskTableProps {
   searchParamsPromise: Promise<{
@@ -34,7 +36,7 @@ interface TaskTableProps {
     category?: string;
     page?: string;
   }>;
-  sessionPromise: Promise<any>;
+  sessionPromise: Promise<Session | null>;
 }
 
 export async function TaskTable({ searchParamsPromise, sessionPromise }: TaskTableProps) {

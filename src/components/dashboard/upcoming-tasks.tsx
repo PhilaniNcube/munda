@@ -1,4 +1,4 @@
-import { MoreHorizontal, Clock, CalendarDays, AlertTriangle, Sprout, PawPrint, CheckCircle2, Circle } from "lucide-react";
+import { MoreHorizontal, Clock, AlertTriangle, Sprout, CheckCircle2, Circle } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
